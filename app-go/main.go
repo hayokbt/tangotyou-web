@@ -2,8 +2,8 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	_ "modernc.org/sqlite"
@@ -18,30 +18,31 @@ type Word struct {
 }
 
 func main() {
-	db, _ := sql.Open("sqlite", "tangotyou.db")
+	db, err := sql.Open("sqlite", "tangotyou.db")
+	if err != nil {
+		log.Fatalf("db open error: %v", err)
+	}
 	defer db.Close()
-	_ = db.Ping()
+	if err := db.Ping(); err != nil {
+		log.Fatalf("db ping error: %v", err)
+	}
 
-	_ = data.Setup(db)
-
-	// データを1件返すだけの窓口（API）
-	http.HandleFunc("/word", func(w http.ResponseWriter, r *http.Request) {
-		row := db.QueryRow("SELECT term, meaning FROM words LIMIT 1")
-		var word Word
-		if err := row.Scan(&word.Term, &word.Meaning); err != nil {
-			word = Word{Term: "Error", Meaning: "データがありません"}
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(word)
-	})
+	if err := data.Setup(db); err != nil {
+		log.Fatalf("db setup error: %v", err)
+	}
+	account.InitSessionStore()
 
 	// 新規アカウント作成
 	http.HandleFunc("/account", account.HandleNewAccount(db))
-
 	// ログイン
 	http.HandleFunc("/login", account.HandleLogin(db))
+	// ログアウト
+	http.HandleFunc("/logout", account.HandleLogout())
+	// ログイン状態確認
+	http.HandleFunc("/me", account.HandleMe())
 
 	fmt.Println("Goサーバー起動")
-	http.ListenAndServe(":8080", nil) // 8080ポートで待機
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		log.Fatalf("server error: %v", err)
+	}
 }
