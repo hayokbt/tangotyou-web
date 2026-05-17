@@ -4,11 +4,15 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"strings"
 )
 
 // 引数に db を受け取り、http.HandlerFunc を返すように変更
 func HandleNewAccount(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if handleCorsPreflight(w, r) {
+			return
+		}
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
@@ -30,15 +34,19 @@ func HandleNewAccount(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// クロージャーの性質により、外側の db にアクセスできます
 		_, err := db.Exec("INSERT INTO account (username, password) VALUES (?, ?)", creds.Username, creds.Password)
 		if err != nil {
+			msg := err.Error()
+			if strings.Contains(msg, "UNIQUE constraint failed") {
+				json.NewEncoder(w).Encode(map[string]string{"error": "Username already in use"})
+			} else {
+				json.NewEncoder(w).Encode(map[string]string{"error": msg})
+			}
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{"ok": "created"})
+		json.NewEncoder(w).Encode(map[string]interface{}{"success": true, "message": "created"})
 	}
 }

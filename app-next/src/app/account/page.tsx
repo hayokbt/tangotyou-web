@@ -2,6 +2,7 @@
 
 import "@/app/globals.css"
 import { useState } from 'react';
+import axios from 'axios';
 import { newAccount } from '@/data/newAccount';
 import { login as apiLogin } from '@/data/login';
 import { useRouter } from 'next/navigation';
@@ -41,7 +42,10 @@ export default function Account() {
             }
         } catch (err) {
             console.error(err);
-            setInputError('ログインに失敗しました');
+            const errorMessage = axios.isAxiosError(err) && err.response?.data?.error
+                ? String(err.response.data.error)
+                : 'ログインに失敗しました';
+            setInputError(errorMessage);
         }
     }
 
@@ -62,7 +66,10 @@ export default function Account() {
             }
         } catch (err) {
             console.error(err);
-            setInputError('登録に失敗しました');
+            const errorMessage = axios.isAxiosError(err) && err.response?.data?.error
+                ? String(err.response.data.error)
+                : '登録に失敗しました';
+            setInputError(errorMessage);
         }
     }
 

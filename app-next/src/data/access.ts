@@ -7,5 +7,7 @@ export const createRequests = {
 }
 
 export const authRequests = {
-    login: "http://127.0.0.1:8080/login"
+    login: "http://127.0.0.1:8080/login",
+    logout: "http://127.0.0.1:8080/logout",
+    me: "http://127.0.0.1:8080/me"
 }

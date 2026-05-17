@@ -1,44 +1,69 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { get1Word } from "@/data/get1Word";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const [term, setTerm] = useState("読み込み中...");
-  const [meaning, setMeaning] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
   const handleAccount = async () => {
-    router.push("/account");
+    if (!isLoggedIn) {
+      router.push("/account");
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      const res = await fetch("/api/account/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (res.ok) {
+        setIsLoggedIn(false);
+      } else {
+        console.error("logout failed", await res.text());
+      }
+    } catch (error) {
+      console.error("logout error:", error);
+    }
   };
 
   useEffect(() => {
-    const handle1Word = async () => {
+    const checkLogin = async () => {
       try {
-        console.log("単語を取得開始...");
-        const [nextTerm, nextMeaning] = await get1Word();
-        console.log("取得成功:", nextTerm, nextMeaning);
-        setTerm(nextTerm);
-        setMeaning(nextMeaning);
+        const res = await fetch("/api/account/me", { credentials: "include" });
+        if (!res.ok) {
+          setIsLoggedIn(false);
+          return;
+        }
+        const data = await res.json();
+        setIsLoggedIn(Boolean(data?.loggedIn));
       } catch (error) {
-        console.error("単語取得エラー:", error);
-        setTerm("取得エラー");
-        setMeaning("単語を読み込めませんでした。バックエンドが起動しているか確認してください。");
+        console.error("login check error:", error);
+        setIsLoggedIn(false);
       }
     };
 
-    handle1Word();
+    checkLogin();
   }, []);
 
   return (
     <div>
       <h1>単語帳アプリ</h1>
-      <h2>{term}</h2>
-      <p>{meaning}</p>
-      <button type="button" onClick={handleAccount}>
+      <button type="button" onClick={handleAccount} disabled={isLoggedIn}>
         アカウントページへ
       </button>
+      {isLoggedIn && (
+        <>
+          <button type="button" onClick={handleLogout} style={{ marginLeft: 12 }}>
+            ログアウト
+          </button>
+          <p style={{ color: "green", marginTop: 12 }}>
+            現在ログイン状態です
+          </p>
+        </>
+      )}
     </div>
   );
 }
