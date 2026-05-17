@@ -33,13 +33,13 @@ func main() {
 	account.InitSessionStore()
 
 	// 新規アカウント作成
-	http.HandleFunc("/account", account.HandleNewAccount(db))
+	http.HandleFunc("/account/create", account.HandleNewAccount(db))
 	// ログイン
-	http.HandleFunc("/login", account.HandleLogin(db))
+	http.HandleFunc("/account/login", account.HandleLogin(db))
 	// ログアウト
-	http.HandleFunc("/logout", account.HandleLogout())
+	http.HandleFunc("/account/logout", account.HandleLogout())
 	// ログイン状態確認
-	http.HandleFunc("/me", account.HandleMe())
+	http.HandleFunc("/account/me", account.HandleMe())
 
 	fmt.Println("Goサーバー起動")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
