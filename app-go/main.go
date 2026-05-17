@@ -7,6 +7,9 @@ import (
 	"net/http"
 
 	_ "modernc.org/sqlite"
+
+	"app-go/account"
+	data "app-go/handler"
 )
 
 type Word struct {
@@ -15,8 +18,11 @@ type Word struct {
 }
 
 func main() {
-	db, _ := sql.Open("sqlite", "vocab.db")
+	db, _ := sql.Open("sqlite", "tangotyou.db")
 	defer db.Close()
+	_ = db.Ping()
+
+	_ = data.Setup(db)
 
 	// データを1件返すだけの窓口（API）
 	http.HandleFunc("/word", func(w http.ResponseWriter, r *http.Request) {
@@ -29,6 +35,12 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(word)
 	})
+
+	// 新規アカウント作成
+	http.HandleFunc("/account", account.HandleNewAccount(db))
+
+	// ログイン
+	http.HandleFunc("/login", account.HandleLogin(db))
 
 	fmt.Println("Goサーバー起動")
 	http.ListenAndServe(":8080", nil) // 8080ポートで待機
