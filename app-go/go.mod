@@ -4,6 +4,7 @@ go 1.26.2
 
 require (
 	github.com/gorilla/sessions v1.4.0
+	golang.org/x/crypto v0.31.0
 	modernc.org/sqlite v1.50.0
 )
 

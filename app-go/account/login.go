@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/sessions"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func HandleLogin(db *sql.DB) http.HandlerFunc {
@@ -28,9 +29,17 @@ func HandleLogin(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		row := db.QueryRow("SELECT id FROM account WHERE username = ? AND password = ?", creds.Username, creds.Password)
+		row := db.QueryRow("SELECT id, password FROM account WHERE username = ?", creds.Username)
 		var id int
-		if err := row.Scan(&id); err != nil {
+		var hashedPassword string
+		if err := row.Scan(&id, &hashedPassword); err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]string{"error": "The username or password is incorrect."})
+			return
+		}
+
+		// bcryptでパスワードを比較
+		if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(creds.Password)); err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
 			json.NewEncoder(w).Encode(map[string]string{"error": "The username or password is incorrect."})
 			return
