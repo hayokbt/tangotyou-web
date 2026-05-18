@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 // 引数に db を受け取り、http.HandlerFunc を返すように変更
@@ -34,7 +36,15 @@ func HandleNewAccount(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		_, err := db.Exec("INSERT INTO account (username, password) VALUES (?, ?)", creds.Username, creds.Password)
+		// パスワードをbcryptでハッシュ化
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(creds.Password), bcrypt.DefaultCost)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]string{"error": "password hashing failed"})
+			return
+		}
+
+		_, err = db.Exec("INSERT INTO account (username, password) VALUES (?, ?)", creds.Username, string(hashedPassword))
 		if err != nil {
 			msg := err.Error()
 			if strings.Contains(msg, "UNIQUE constraint failed") {

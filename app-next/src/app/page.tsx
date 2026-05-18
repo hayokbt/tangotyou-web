@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
   const router = useRouter();
 
   const handleAccount = async () => {
@@ -35,13 +36,16 @@ export default function Home() {
         const res = await fetch("/api/account/me", { credentials: "include" });
         if (!res.ok) {
           setIsLoggedIn(false);
+          setUsername("");
           return;
         }
         const data = await res.json();
         setIsLoggedIn(Boolean(data?.loggedIn));
+        setUsername(data?.username || "");
       } catch (error) {
         console.error("login check error:", error);
         setIsLoggedIn(false);
+        setUsername("");
       }
     };
 
@@ -60,7 +64,7 @@ export default function Home() {
             ログアウト
           </button>
           <p style={{ color: "green", marginTop: 12 }}>
-            現在ログイン状態です
+            {username}にログインしています
           </p>
         </>
       )}
