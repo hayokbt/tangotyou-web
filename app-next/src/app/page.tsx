@@ -52,6 +52,10 @@ export default function Home() {
     checkLogin();
   }, []);
 
+  const handleBookList = async () => {
+      router.push("/booklist");
+  }
+
   return (
     <div>
       <h1>単語帳アプリ</h1>
@@ -66,6 +70,9 @@ export default function Home() {
           <p style={{ color: "green", marginTop: 12 }}>
             {username}にログインしています
           </p>
+          <button type="button" onClick={handleBookList} style={{ marginLeft: 12}}>
+            ブックリストページへ
+          </button>
         </>
       )}
     </div>
