@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function BookList() {
   const [books, setBooks] = useState<Array<{ id: number; title: string }>>([]);
@@ -144,8 +145,13 @@ export default function BookList() {
       {!loading && !addError && books.length > 0 && (
         <ul style={{ marginTop: 16 }}>
           {books.map((book) => (
-            <li key={book.id} style={{ marginBottom: 8 }}>
-              {book.title}
+            <li key={book.id} style={{ marginBottom: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span>{book.title}</span>
+              <Link href={`/book/${encodeURIComponent(book.title)}`}>
+                <button type="button" style={{ marginLeft: 8, padding: "4px 8px", backgroundColor: "#2196F3", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}>
+                  表示
+                </button>
+              </Link>
             </li>
           ))}
         </ul>
