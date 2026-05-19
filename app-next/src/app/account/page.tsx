@@ -1,6 +1,5 @@
 "use client"
 
-import "@/app/globals.css"
 import { useState } from 'react';
 import axios from 'axios';
 import { newAccount } from '@/data/newAccount';
@@ -76,14 +75,14 @@ export default function Account() {
     return (
         <div>
             <h1>account</h1>
-            <div style={{display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 400}}>
+            <div className="form-container">
                 <label>
                     Username
                     <input
                         type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        style={{width: '100%', padding: 8, marginTop: 4}}
+                        className="form-input"
                     />
                 </label>
 
@@ -93,18 +92,18 @@ export default function Account() {
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        style={{width: '100%', padding: 8, marginTop: 4}}
+                        className="form-input"
                     />
                 </label>
 
                 {inputError !== "" && (
-                    <div style={{color: 'red', marginTop: 8, marginBottom: 8}}>
+                    <div className="error-text">
                         {inputError}
                     </div>
                 )}
 
-                <button type="button" onClick={handleLogin} style={{padding: 8, marginTop: 8}}>ログイン</button>
-                <button type="button" onClick={handleNewAccount} style={{padding: 8, marginTop: 8}}>新規登録</button>
+                <button type="button" onClick={handleLogin} className="button">ログイン</button>
+                <button type="button" onClick={handleNewAccount} className="button">新規登録</button>
             </div>
         </div>
     )
