@@ -42,6 +42,8 @@ func main() {
 	http.HandleFunc("/account/me", account.HandleMe())
 	// ログイン中ユーザーのbook一覧取得
 	http.HandleFunc("/account/books", account.HandleBooks(db))
+	// ブック内の単語一覧取得・作成・更新・削除
+	http.HandleFunc("/account/books/{bookName}/words", account.HandleWords(db))
 
 	fmt.Println("Goサーバー起動")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
