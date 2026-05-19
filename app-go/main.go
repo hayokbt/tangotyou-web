@@ -9,7 +9,7 @@ import (
 	_ "modernc.org/sqlite"
 
 	"app-go/account"
-	data "app-go/handler"
+	data "app-go/data"
 )
 
 type Word struct {
@@ -40,6 +40,8 @@ func main() {
 	http.HandleFunc("/account/logout", account.HandleLogout())
 	// ログイン状態確認
 	http.HandleFunc("/account/me", account.HandleMe())
+	// ログイン中ユーザーのbook一覧取得
+	http.HandleFunc("/account/books", account.HandleBooks(db))
 
 	fmt.Println("Goサーバー起動")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
