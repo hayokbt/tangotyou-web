@@ -32,7 +32,7 @@ Webで動く単語帳アプリケーションです。フロントエンドと�
 ### 1. バックエンドを起動
 
 ```bash
-cd app-go
+./app-go
 go run main.go
 ```
 
