@@ -39,7 +39,7 @@ export default function BookDetail() {
         const data = await res.json();
         setWords(Array.isArray(data?.words) ? data.words : []);
       }
-    } catch (err) {
+    } catch {
       setError("単語一覧の読み込みに失敗しました。");
       setWords([]);
     } finally {
@@ -85,7 +85,7 @@ export default function BookDetail() {
       setNewTerm("");
       setNewMeaning("");
       await fetchWords();
-    } catch (err) {
+    } catch {
       setError("単語の追加に失敗しました。");
       setLoading(false);
     }
@@ -133,7 +133,7 @@ export default function BookDetail() {
       setEditTerm("");
       setEditMeaning("");
       await fetchWords();
-    } catch (err) {
+    } catch {
       setError("単語の更新に失敗しました。");
       setLoading(false);
     }
@@ -156,9 +156,13 @@ export default function BookDetail() {
         return;
       }
       await fetchWords();
-    } catch (err) {
+    } catch {
       setError("単語の削除に失敗しました。");
     }
+  };
+
+  const goToPlay = () => {
+    router.push(`/book/${encodeURIComponent(bookName)}/play`);
   };
 
   const handleBack = () => {
@@ -174,13 +178,22 @@ export default function BookDetail() {
           <h1 className="text-xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
             📖 {decodeURIComponent(bookName)}
           </h1>
-          <button 
-            type="button" 
-            onClick={handleBack} 
-            className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors px-3 py-1.5 rounded-md hover:bg-gray-50 border border-gray-200"
-          >
-            ← ブック一覧に戻る
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={goToPlay}
+              className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors px-4 py-2 rounded-md shadow-sm"
+            >
+              Play
+            </button>
+            <button 
+              type="button" 
+              onClick={handleBack} 
+              className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors px-3 py-1.5 rounded-md hover:bg-gray-50 border border-gray-200"
+            >
+              ← ブック一覧に戻る
+            </button>
+          </div>
         </div>
 
         {error && (
